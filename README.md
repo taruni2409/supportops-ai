@@ -87,3 +87,67 @@ SupportOps AI ticket-intent classifier.
 It will instead be retained for operational analytics and dashboard development,
 while a more consistently labelled intent-classification dataset will be used
 for the NLP modelling component.
+
+## BANKING77 Intent Classification
+
+After identifying label-quality issues in the initial customer-support dataset,
+BANKING77 was selected as the primary dataset for SupportOps AI intent
+classification.
+
+### Dataset
+
+- 10,003 official training examples
+- 3,080 official test examples
+- 77 customer-support intents
+- 7 normalized queries overlapped between the official training and test sets
+- A strict evaluation set was created with zero normalized train/test overlap
+
+### Baseline Model
+
+The first BANKING77 baseline used:
+
+- TF-IDF text vectorization
+- Unigrams and bigrams
+- Logistic Regression
+- 77-class intent classification
+
+Baseline performance:
+
+| Evaluation | Accuracy | Macro F1 |
+|---|---:|---:|
+| Official Test | 85.88% | 85.81% |
+| Strict Zero-Overlap Test | 85.84% | 85.76% |
+
+The very small difference between the official and strict evaluations indicates
+that the overlapping examples did not materially inflate model performance.
+
+### Hyperparameter Tuning
+
+The classical model was further optimized using:
+
+- Stratified train/validation splitting
+- 3-fold Stratified Cross-Validation
+- GridSearchCV
+- Macro F1 as the model-selection metric
+- TF-IDF n-gram tuning
+- Minimum document-frequency tuning
+- Sublinear term-frequency tuning
+- Logistic Regression regularization tuning
+
+The best configuration identified during cross-validation was:
+
+- `ngram_range = (1, 1)`
+- `min_df = 1`
+- `sublinear_tf = True`
+- `C = 4.0`
+
+Best cross-validation Macro F1: approximately **86.67%**.
+
+> Final tuned-model validation and test results are recorded in the experiment
+> notebook and will be compared against Transformer-based models in the next phase.
+
+### Next Phase
+
+The next stage will fine-tune a Transformer model for the same 77-class intent
+classification task and compare it against the TF-IDF + Logistic Regression
+baseline.
