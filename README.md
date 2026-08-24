@@ -31,12 +31,6 @@ SupportOps AI is an end-to-end Machine Learning and Generative AI project design
 - React / Next.js
 - Azure
 
-## Project Status
-
-🚧 Currently under development.
-
-## Current Progress
-
 ### Phase 1 — Dataset Exploration & Baseline NLP Classification
 
 An initial customer-support dataset containing 8,469 tickets was evaluated
