@@ -1,0 +1,4 @@
+Model,Official Accuracy,Official Macro F1,Strict Accuracy,Strict Macro F1
+TF-IDF + Logistic Regression,0.8588,0.8581,0.8584,0.8576
+DistilBERT - 3 epochs,0.8159,0.7975,0.8161,0.7975
+DistilBERT - 5 epochs,0.9061688311688312,0.9059469099972193,0.9059550927432476,0.9056949494894397
