@@ -190,8 +190,72 @@ The very small difference between official and strict zero-overlap evaluation
 shows that the small number of duplicate queries in the official BANKING77 split
 did not materially inflate performance.
 
-### Next Phase
+## Retrieval-Augmented Generation (RAG)
 
-The next phase will add a Retrieval-Augmented Generation (RAG) knowledge
-assistant that retrieves relevant support policies and uses an LLM to generate
-grounded resolution recommendations with source citations.
+SupportOps AI includes a grounded knowledge assistant for generating
+policy-based customer-support recommendations.
+
+The RAG pipeline uses:
+
+- Sentence Transformers (`all-MiniLM-L6-v2`) for semantic embeddings
+- 384-dimensional normalized text embeddings
+- ChromaDB for persistent vector storage and cosine-similarity retrieval
+- Top-K semantic retrieval over synthetic NovaBank support policies
+- Gemini Flash-Lite for grounded response generation
+- Explicit source citations for generated recommendations
+- Retrieval-confidence guardrails for out-of-domain requests
+- Safe fallback behavior when retrieved policies do not support an answer
+
+### Knowledge Base
+
+The demonstration knowledge base contains eight synthetic NovaBank policy
+documents covering:
+
+- Card payments
+- Refunds
+- Bank transfers
+- Cash withdrawals
+- Cards and PIN
+- Account security
+- Identity verification
+- Support escalation
+
+All policies are synthetic and were created solely for this portfolio project.
+
+### RAG Evaluation
+
+Retrieval was evaluated separately from generation to distinguish retrieval
+failures from LLM-generation failures.
+
+On the controlled synthetic evaluation set:
+
+| Metric | Result |
+|---|---:|
+| Retrieval Hit@1 | 100% |
+| Retrieval Hit@3 | 100% |
+| Supported-query pass rate | 100% |
+| Out-of-domain rejection rate | 100% |
+| Citation compliance | 100% |
+| Citation/refusal behavior | 100% |
+
+These results reflect a controlled synthetic evaluation and should not be
+interpreted as production-level performance.
+
+### RAG Guardrails
+
+SupportOps AI uses two levels of protection against unsupported responses:
+
+1. A retrieval-confidence threshold prevents clearly unrelated questions from
+   reaching the LLM.
+2. Grounding instructions require the LLM to use only retrieved policy evidence
+   and return an insufficient-context response when the available policies do
+   not support an answer.
+
+This design handles both completely out-of-domain questions and semantically
+banking-related questions that are unsupported by the knowledge base.
+
+
+## Next Phase
+
+The next phase will add an SLA and escalation-risk prediction model to identify
+support tickets that may require proactive intervention.

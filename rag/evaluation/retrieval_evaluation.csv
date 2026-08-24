@@ -1,0 +1,9 @@
+question,expected_source,top_1_source,hit_at_1,hit_at_3
+I was charged twice for the same transaction.,01_card_payments.md,02_refunds.md,False,True
+The merchant refunded me but the money has not arrived.,02_refunds.md,02_refunds.md,True,True
+My bank transfer has been pending for three days.,03_bank_transfers.md,03_bank_transfers.md,True,True
+The ATM charged me but did not give me any cash.,04_cash_withdrawals.md,04_cash_withdrawals.md,True,True
+My PIN has been blocked after too many attempts.,05_cards_and_pin.md,05_cards_and_pin.md,True,True
+I lost my card and think somebody may be using it.,06_account_security.md,05_cards_and_pin.md,False,True
+My identity verification keeps failing.,07_identity_verification.md,07_identity_verification.md,True,True
+When should a customer support case be escalated?,08_support_escalation.md,08_support_escalation.md,True,True

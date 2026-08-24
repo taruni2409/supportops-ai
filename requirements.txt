@@ -129,3 +129,7 @@ websocket-client==1.9.0
 widgetsnbextension==4.0.16
 xxhash==4.0.1
 yarl==1.24.5
+sentence-transformers
+chromadb
+google-genai
+python-dotenv

@@ -1,0 +1,33 @@
+question,category,expected_source,top_source,top_similarity,hit_at_1,hit_at_3,passes_threshold
+Why was my card payment declined even though I have enough money?,supported,01_card_payments.md,01_card_payments.md,0.7087,True,True,True
+I can see the same card purchase twice on my account.,supported,01_card_payments.md,01_card_payments.md,0.5972,True,True,True
+There is a card transaction I do not recognise.,supported,01_card_payments.md,01_card_payments.md,0.6073,True,True,True
+The merchant says they refunded me but I still cannot see it.,supported,02_refunds.md,02_refunds.md,0.4554,True,True,True
+How long should I wait for a merchant refund to appear?,supported,02_refunds.md,02_refunds.md,0.7916,True,True,True
+The merchant processed my refund more than ten business days ago.,supported,02_refunds.md,02_refunds.md,0.6719,True,True,True
+My transfer has been pending for three business days.,supported,03_bank_transfers.md,03_bank_transfers.md,0.6836,True,True,True
+My bank transfer keeps failing.,supported,03_bank_transfers.md,03_bank_transfers.md,0.6117,True,True,True
+The transfer says completed but the recipient has not received it.,supported,03_bank_transfers.md,03_bank_transfers.md,0.7164,True,True,True
+The ATM charged my account but did not give me cash.,supported,04_cash_withdrawals.md,04_cash_withdrawals.md,0.6064,True,True,True
+The ATM gave me less cash than the amount shown on my account.,supported,04_cash_withdrawals.md,04_cash_withdrawals.md,0.6404,True,True,True
+My cash withdrawal keeps getting declined.,supported,04_cash_withdrawals.md,04_cash_withdrawals.md,0.7096,True,True,True
+My PIN is blocked after several incorrect attempts.,supported,05_cards_and_pin.md,05_cards_and_pin.md,0.7663,True,True,True
+My new card will not activate.,supported,05_cards_and_pin.md,05_cards_and_pin.md,0.6811,True,True,True
+My physical card is damaged and no longer works.,supported,05_cards_and_pin.md,05_cards_and_pin.md,0.663,True,True,True
+I lost my card and I think someone has used it.,supported,06_account_security.md,06_account_security.md,0.5007,True,True,True
+I think someone has gained access to my account.,supported,06_account_security.md,06_account_security.md,0.4799,True,True,True
+I lost the phone I use to access NovaBank.,supported,06_account_security.md,06_account_security.md,0.6972,True,True,True
+My identity verification keeps failing.,supported,07_identity_verification.md,07_identity_verification.md,0.6346,True,True,True
+My account name does not match my identity document.,supported,07_identity_verification.md,07_identity_verification.md,0.5544,True,True,True
+What happens when automated verification repeatedly fails?,supported,07_identity_verification.md,07_identity_verification.md,0.7568,True,True,True
+When should a support case be escalated?,supported,08_support_escalation.md,08_support_escalation.md,0.7427,True,True,True
+What information should an escalation contain?,supported,08_support_escalation.md,08_support_escalation.md,0.7363,True,True,True
+How should suspected account takeover be escalated?,supported,08_support_escalation.md,08_support_escalation.md,0.6094,True,True,True
+What interest rate does NovaBank pay on savings accounts?,unsupported_in_domain,,03_bank_transfers.md,0.6278,,,True
+Does NovaBank offer mortgages?,unsupported_in_domain,,01_card_payments.md,0.6099,,,True
+What is NovaBank's overdraft interest rate?,unsupported_in_domain,,01_card_payments.md,0.6097,,,True
+Can I open a business banking account?,unsupported_in_domain,,06_account_security.md,0.3603,,,False
+What is the weather tomorrow?,out_of_domain,,01_card_payments.md,0.0893,,,False
+Who won yesterday's football match?,out_of_domain,,04_cash_withdrawals.md,0.126,,,False
+Can you recommend a laptop?,out_of_domain,,05_cards_and_pin.md,0.0717,,,False
+Write a birthday message for my friend.,out_of_domain,,05_cards_and_pin.md,0.0968,,,False

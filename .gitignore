@@ -47,3 +47,9 @@ mlruns/
 
 # Trained models and checkpoints
 ml/artifacts/
+
+# Local vector database
+rag/chroma_db/
+
+# Secrets
+.env

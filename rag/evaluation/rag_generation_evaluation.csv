@@ -1,0 +1,58 @@
+question,status,top_similarity,answer,has_citation,valid_citations,citation_behavior_correct
+I was charged twice for the same card payment.,answered,0.6341,"To assist the customer who was charged twice for the same card payment, follow these steps:
+
+1. **Verify Transaction Status:** Ask the customer to verify whether both transactions have fully completed, as one transaction may temporarily remain pending before disappearing [Source 2].
+2. **Confirm Purchase Details:** Ensure both completed transactions represent the same purchase, and collect the required information from the customer:
+   - Merchant name [Source 1, Source 2]
+   - Transaction date [Source 1, Source 2]
+   - Transaction amount [Source 1, Source 2]
+   - Evidence that both transactions represent the same purchase [Source 1]
+   - The last four digits of the affected card [Source 2]
+3. **Initiate Investigation:** Once both transactions are confirmed as completed and represent the same purchase, create a duplicate-payment investigation [Source 1, Source 2].
+4. **Timeline:** Inform the customer that duplicate-payment investigations are normally reviewed within five business days [Source 2].",True,True,True
+My transfer has been pending for three business days.,answered,0.6836,"**Grounded Support Recommendation:**
+
+1. Inform the customer that standard pending transfers may take up to two business days to complete [Source 1].
+2. Because the transfer has been pending for three business days (exceeding the two-business-day timeline), escalate the case to the Transfers team [Source 1].",True,True,True
+The ATM charged my account but did not give me cash.,answered,0.6064,"**Grounded Support Recommendation:**
+
+1. Advise the customer not to immediately repeat the same withdrawal [Source 1].
+2. Collect and record the following details from the customer:
+   - ATM location [Source 1]
+   - Withdrawal date [Source 1]
+   - Withdrawal amount [Source 1]
+   - Last four digits of the card [Source 1]
+3. Submit the case for a cash-withdrawal investigation [Source 1]. 
+4. Inform the customer that cash-withdrawal investigations are normally reviewed within seven business days [Source 1].",True,True,True
+My PIN is blocked.,answered,0.6819,"To assist the customer with a blocked PIN, please follow these steps:
+
+1. Instruct the customer not to continue entering possible PIN combinations [Source 1].
+2. Verify the customer's identity before providing available PIN recovery instructions [Source 1].
+3. If the PIN cannot be restored using the supported recovery process, escalate the case to the Cards team [Source 1].
+4. Never ask the customer to provide their full PIN [Source 2].",True,True,True
+I lost my card and think someone may have used it.,answered,0.4974,"To assist the customer who has lost their card and suspects unauthorized use, please follow these actionable steps based on NovaBank policy:
+
+1. **Freeze the Card:** Immediately freeze the lost card to prevent any further use [Source 1].
+2. **Review Transactions:** Confirm with the customer whether any recent transactions are unrecognized [Source 1]. Remind support agents to review these transactions without requesting sensitive authentication information such as the full PIN [Source 3].
+3. **Escalate for Fraud:** If suspicious or unauthorized transactions are identified, escalate the case to the Fraud and Security team / handle through the appropriate fraud investigation process [Source 1, Source 3].
+4. **Request Replacement:** Once the affected card has been secured, a replacement card may be requested [Source 1].",True,True,True
+My identity verification keeps failing.,answered,0.6346,"To assist the customer with their repeated identity verification failures, follow these actionable steps based on NovaBank policy:
+
+1. **Confirm Information:** Instruct the customer to confirm that the information they submitted matches the information registered on their account [Source 1].
+2. **Check Document Quality:** Ensure that the submitted documents are clear, valid, and readable [Source 1].
+3. **Escalate for Manual Review:** Because the verification has failed repeatedly, escalate the case to the Identity Verification team for manual review [Source 1, Source 2].
+4. **Record Details:** Record the reason for the escalation and the verification steps that have already been attempted [Source 2].",True,True,True
+What information should an escalation contain?,answered,0.7363,"Based on NovaBank's support policy, an escalation should contain the following information:
+
+* A concise description of the problem or the customer's issue [Source 1, Source 2].
+* Relevant transaction information, including relevant dates and amounts, as well as merchant or recipient details [Source 1, Source 2, Source 3].
+* Actions or troubleshooting already performed [Source 1, Source 2].
+* Supporting evidence supplied by the customer [Source 1, Source 2, Source 3].
+* The reason for the escalation [Source 1].",True,True,True
+What interest rate does NovaBank pay on savings accounts?,insufficient_context,0.6278,The available policy context does not provide enough information.,False,,True
+Does NovaBank offer mortgages?,insufficient_context,0.6099,The available policy context does not provide enough information.,False,,True
+What is NovaBank's overdraft interest rate?,insufficient_context,0.6097,The available policy context does not provide enough information.,False,,True
+Can I open a business banking account?,low_retrieval_confidence,0.3603,The available policy context does not provide enough information.,False,,True
+What is the weather tomorrow?,low_retrieval_confidence,0.0893,The available policy context does not provide enough information.,False,,True
+Can you recommend a laptop?,low_retrieval_confidence,0.0717,The available policy context does not provide enough information.,False,,True
+Write me a birthday message.,low_retrieval_confidence,0.1228,The available policy context does not provide enough information.,False,,True
