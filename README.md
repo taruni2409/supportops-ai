@@ -254,8 +254,75 @@ SupportOps AI uses two levels of protection against unsupported responses:
 This design handles both completely out-of-domain questions and semantically
 banking-related questions that are unsupported by the knowledge base.
 
+## SLA Breach Risk Prediction
 
+SupportOps AI includes an explainable SLA-risk model designed to identify
+support tickets that may require proactive intervention.
+
+### Data Quality Decision
+
+The original customer-support dataset was evaluated for SLA modelling, but
+49.30% of resolved tickets produced impossible negative response-to-resolution
+durations.
+
+Rather than constructing a misleading SLA target from unreliable timestamps,
+the project uses a controlled synthetic NovaBank operational dataset with
+explicit SLA rules and documented risk-generation assumptions.
+
+### SLA Rules
+
+| Priority | Resolution SLA |
+|---|---:|
+| Critical | 4 hours |
+| High | 8 hours |
+| Medium | 24 hours |
+| Low | 48 hours |
+
+### Models Evaluated
+
+Two models were evaluated:
+
+- Logistic Regression baseline
+- XGBoost classifier
+
+Model selection used the validation set with an operational requirement of at
+least 70% recall for SLA breaches.
+
+XGBoost was selected at a decision threshold of **0.25**, providing a better
+precision/F1 trade-off while satisfying the recall requirement.
+
+### Final Test Performance
+
+| Metric | Result |
+|---|---:|
+| Precision | 40.23% |
+| Recall | **77.98%** |
+| F1 | 53.07% |
+| ROC-AUC | 66.54% |
+| PR-AUC | 49.65% |
+
+The lower operational threshold intentionally prioritizes breach detection over
+raw accuracy because missed SLA breaches are considered more costly than
+additional review alerts.
+
+### Explainability
+
+SHAP was used to explain both global model behaviour and individual ticket
+predictions.
+
+The strongest global risk drivers included:
+
+- Queue load
+- Agent utilization
+- Ticket creation timing
+- Critical ticket priority
+- Customer sentiment
+- Previous customer contacts
+- Outside-business-hours submission
+
+The evaluation results reflect a controlled synthetic SLA-risk dataset and
+should not be interpreted as production performance.
 ## Next Phase
 
-The next phase will add an SLA and escalation-risk prediction model to identify
-support tickets that may require proactive intervention.
+The next phase will expose the intent classifier, SLA-risk model and RAG
+assistant through a unified FastAPI backend.

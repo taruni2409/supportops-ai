@@ -1,0 +1,11 @@
+feature,shap_value,absolute_impact,effect
+categorical__ticket_priority_Critical,0.84963423,0.84963423,Increases breach risk
+numerical__agent_utilization,0.7882129,0.7882129,Increases breach risk
+numerical__queue_load,0.4453779,0.4453779,Increases breach risk
+numerical__message_length,0.18426962,0.18426962,Increases breach risk
+numerical__account_age_days,0.093110904,0.093110904,Increases breach risk
+numerical__created_day,-0.082391195,0.082391195,Decreases breach risk
+categorical__intent_account_security,0.07535364,0.07535364,Increases breach risk
+categorical__ticket_priority_High,-0.06282501,0.06282501,Decreases breach risk
+numerical__sentiment_score,0.05161133,0.05161133,Increases breach risk
+categorical__ticket_priority_Low,0.051537614,0.051537614,Increases breach risk

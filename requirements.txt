@@ -133,3 +133,6 @@ sentence-transformers
 chromadb
 google-genai
 python-dotenv
+xgboost
+shap
+joblib
