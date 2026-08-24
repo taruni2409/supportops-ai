@@ -145,9 +145,59 @@ Best cross-validation Macro F1: approximately **86.67%**.
 
 > Final tuned-model validation and test results are recorded in the experiment
 > notebook and will be compared against Transformer-based models in the next phase.
+### Transformer Model — DistilBERT
+
+A pretrained `distilbert-base-uncased` model was fine-tuned for the same
+77-class BANKING77 intent-classification task.
+
+Token-length analysis showed:
+
+- Mean sequence length: ~16 tokens
+- 95% of queries: ≤ 37 tokens
+- 99% of queries: ≤ 53 tokens
+- Maximum sequence length: 98 tokens
+
+Based on this distribution, `max_length = 64` was selected to reduce unnecessary
+padding while retaining virtually all query information.
+
+#### DistilBERT Experiment 1 — 3 Epochs
+
+| Evaluation | Accuracy | Macro F1 |
+|---|---:|---:|
+| Official Test | 81.59% | 79.75% |
+| Strict Zero-Overlap Test | 81.61% | 79.75% |
+
+Learning-curve analysis showed that validation performance was still improving
+after epoch 3, indicating that the model was undertrained.
+
+#### DistilBERT Experiment 2 — 5 Epochs
+
+The same configuration was retained while increasing training from 3 to 5 epochs.
+
+Best validation Macro F1: **90.00%**
+
+| Evaluation | Accuracy | Macro F1 |
+|---|---:|---:|
+| Official Test | **90.62%** | **90.59%** |
+| Strict Zero-Overlap Test | **90.60%** | **90.57%** |
+
+### Model Comparison
+
+| Model | Official Accuracy | Official Macro F1 | Strict Accuracy | Strict Macro F1 |
+|---|---:|---:|---:|---:|
+| TF-IDF + Logistic Regression | 85.88% | 85.81% | 85.84% | 85.76% |
+| DistilBERT - 3 Epochs | 81.59% | 79.75% | 81.61% | 79.75% |
+| DistilBERT - 5 Epochs | **90.62%** | **90.59%** | **90.60%** | **90.57%** |
+
+The final 5-epoch DistilBERT model improved official Macro F1 by approximately
+**4.78 percentage points** over the classical TF-IDF + Logistic Regression baseline.
+
+The very small difference between official and strict zero-overlap evaluation
+shows that the small number of duplicate queries in the official BANKING77 split
+did not materially inflate performance.
 
 ### Next Phase
 
-The next stage will fine-tune a Transformer model for the same 77-class intent
-classification task and compare it against the TF-IDF + Logistic Regression
-baseline.
+The next phase will add a Retrieval-Augmented Generation (RAG) knowledge
+assistant that retrieves relevant support policies and uses an LLM to generate
+grounded resolution recommendations with source citations.
