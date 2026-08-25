@@ -165,7 +165,7 @@ def analyze_ticket(
         predicted_intent
     )
 )
-
+    intent_result["sla_category"] = sla_intent
 
     # --------------------------------------------------
     # STEP 2: Derive operational features
