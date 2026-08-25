@@ -10,7 +10,9 @@ type TicketForm = {
   queue_load: number;
   agent_utilization: number;
 };
-
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "http://127.0.0.1:8001";
 export default function Home() {
   const [form, setForm] = useState<TicketForm>({
     ticket_text: "",
@@ -33,7 +35,7 @@ export default function Home() {
   const checkApiHealth = async () => {
     try {
       const response = await fetch(
-        "http://127.0.0.1:8001/health"
+        `${API_BASE_URL}/health`
       );
 
       if (!response.ok) {
@@ -109,7 +111,7 @@ export default function Home() {
     setResult(null);
 
     const response = await fetch(
-      "http://127.0.0.1:8001/analyze-ticket",
+      `${API_BASE_URL}/analyze-ticket`,
       {
         method: "POST",
 

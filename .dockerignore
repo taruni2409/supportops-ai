@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local Python environments
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+
+# Notebook development files
+notebooks/
+
+# Raw/processed datasets are not required by the API
+data/
+
+# Frontend will get its own Docker image
+frontend/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Unused training artifacts/checkpoints
+ml/artifacts/distilbert_5epoch_checkpoints/
+ml/artifacts/distilbert_checkpoints/
+ml/artifacts/banking77_tfidf_logreg.joblib
