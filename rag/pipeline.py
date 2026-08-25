@@ -14,6 +14,9 @@ from google import genai
 from google.genai import types
 from sentence_transformers import SentenceTransformer
 
+import time
+
+from google.genai.errors import ServerError
 
 # ============================================================
 # PROJECT PATHS
@@ -67,9 +70,9 @@ if not gemini_api_key:
 # ============================================================
 
 embedding_model = SentenceTransformer(
-    EMBEDDING_MODEL_NAME
+    EMBEDDING_MODEL_NAME,
+    device="cpu"
 )
-
 
 # ============================================================
 # LOAD CHROMADB
@@ -91,7 +94,7 @@ collection = chroma_client.get_collection(
 gemini_client = genai.Client(
     api_key=gemini_api_key,
     http_options=types.HttpOptions(
-        timeout=30000
+        timeout=90000
     )
 )
 
@@ -237,7 +240,8 @@ GROUNDED SUPPORT RECOMMENDATION
 
 def generate_grounded_answer(
     question,
-    context
+    context,
+    max_retries=3
 ):
 
     prompt = build_rag_prompt(
@@ -245,22 +249,43 @@ def generate_grounded_answer(
         context
     )
 
-    response = (
-        gemini_client.models.generate_content(
-            model=LLM_MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                thinking_config=
-                    types.ThinkingConfig(
-                        thinking_level="minimal"
-                    ),
-                max_output_tokens=500
+    for attempt in range(
+        1,
+        max_retries + 1
+    ):
+
+        try:
+
+            response = (
+                gemini_client.models.generate_content(
+                    model=LLM_MODEL,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        thinking_config=
+                            types.ThinkingConfig(
+                                thinking_level="minimal"
+                            ),
+                        max_output_tokens=500
+                    )
+                )
             )
-        )
-    )
 
-    return response.text
+            return response.text
 
+        except ServerError as exc:
+
+            print(
+                f"Gemini attempt "
+                f"{attempt}/{max_retries} failed: "
+                f"{exc}"
+            )
+
+            if attempt == max_retries:
+                raise
+
+            time.sleep(
+                2 ** attempt
+            )
 
 # ============================================================
 # FALLBACK DETECTION
@@ -340,11 +365,33 @@ def answer_with_rag(
         retrieved
     )
 
-    # Generate Gemini answer
-    answer = generate_grounded_answer(
-        question,
-        context
-    )
+    try:
+        answer = generate_grounded_answer(
+            question,
+            context
+        )
+
+    except ServerError:
+        return {
+        "question":
+            question,
+
+        "answer":
+            (
+                "The support recommendation service "
+                "is temporarily unavailable. "
+                "Please try again shortly."
+            ),
+
+        "sources":
+            retrieved,
+
+        "top_similarity":
+            top_similarity,
+
+        "status":
+            "generation_unavailable"
+        }
 
     # Determine whether KB contained
     # enough information

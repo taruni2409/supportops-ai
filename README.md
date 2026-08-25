@@ -322,7 +322,46 @@ The strongest global risk drivers included:
 
 The evaluation results reflect a controlled synthetic SLA-risk dataset and
 should not be interpreted as production performance.
+
+## FastAPI Backend
+
+SupportOps AI exposes its ML and GenAI capabilities through a unified FastAPI backend.
+
+### API Endpoints
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /health` | Check API and component readiness |
+| `POST /predict-intent` | Predict one of 77 BANKING77 support intents using DistilBERT |
+| `POST /predict-sla-risk` | Estimate SLA-breach probability using XGBoost |
+| `POST /rag` | Generate grounded support recommendations using ChromaDB retrieval and Gemini |
+| `POST /analyze-ticket` | Run intent classification, SLA-risk prediction, and RAG recommendation in one request |
+
+### Unified Ticket Analysis
+
+The `/analyze-ticket` endpoint combines the three AI components:
+
+1. DistilBERT predicts the fine-grained support intent.
+2. The intent is mapped into the broader operational category used by the SLA model.
+3. XGBoost estimates SLA-breach risk using ticket and workload features.
+4. The RAG pipeline retrieves relevant NovaBank policies.
+5. Gemini generates a grounded recommendation with source citations.
+
+### API Reliability
+
+The backend includes:
+
+- Pydantic request validation
+- Explicit response schemas
+- CORS configuration for frontend integration
+- Graceful Gemini timeout handling
+- Retrieval-confidence guardrails
+- Health checks
+- Automated FastAPI tests
+
+On macOS, API serving uses CPU inference with `OMP_NUM_THREADS=1` to maintain stable interoperability between PyTorch and XGBoost.
 ## Next Phase
 
-The next phase will expose the intent classifier, SLA-risk model and RAG
-assistant through a unified FastAPI backend.
+The next phase will build a frontend dashboard that consumes the unified
+`/analyze-ticket` endpoint and displays intent, confidence, SLA risk,
+support recommendations, and retrieved policy citations.

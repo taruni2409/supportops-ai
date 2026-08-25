@@ -136,3 +136,7 @@ python-dotenv
 xgboost
 shap
 joblib
+fastapi
+uvicorn[standard]
+pytest
+httpx
