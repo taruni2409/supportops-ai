@@ -4,7 +4,7 @@ AI-Powered Customer Support Intelligence & Resolution Platform.
 
 SupportOps AI is an end-to-end Machine Learning and Generative AI project designed to automate customer support ticket analysis, predict operational risks, retrieve relevant knowledge, and generate grounded resolution recommendations.
 
-## Planned Capabilities
+## Capabilities
 
 - Customer support ticket classification
 - Sentiment analysis
@@ -18,7 +18,19 @@ SupportOps AI is an end-to-end Machine Learning and Generative AI project design
 - REST API deployment
 - MLOps and CI/CD
 
-## Planned Technology Stack
+## Table of Contents
+
+- Machine Learning Pipeline
+- RAG System
+- SLA Risk Prediction
+- FastAPI Backend
+- Full-Stack Architecture
+- Docker Deployment
+- Screenshots
+- Running Locally
+- Future Improvements
+
+##  Technology Stack
 
 - Python
 - Scikit-learn
@@ -360,8 +372,223 @@ The backend includes:
 - Automated FastAPI tests
 
 On macOS, API serving uses CPU inference with `OMP_NUM_THREADS=1` to maintain stable interoperability between PyTorch and XGBoost.
-## Next Phase
+# Full-Stack Application Architecture
 
-The next phase will build a frontend dashboard that consumes the unified
-`/analyze-ticket` endpoint and displays intent, confidence, SLA risk,
-support recommendations, and retrieved policy citations.
+SupportOps AI was extended into a complete full-stack AI application by integrating a Next.js frontend dashboard with the FastAPI AI backend.
+
+The application provides an interactive interface for customer support analysts to analyze tickets, visualize machine learning predictions, and receive grounded AI-generated resolution recommendations.
+
+The frontend communicates with the FastAPI backend through REST APIs and
+provides a unified interface for:
+
+- Ticket submission
+- Intent prediction visualization
+- SLA breach risk analysis
+- AI-generated support recommendations
+- Retrieved knowledge source display
+- Confidence scores
+
+
+## Final System Architecture
+                Customer Support Agent
+                          |
+                          v
+
+                   Next.js Dashboard
+                 React + TypeScript
+
+                          |
+                          |
+                     REST API
+
+                          |
+                          v
+
+                    FastAPI Backend
+
+          --------------------------------
+
+          |              |               |
+
+          v              v               v
+
+
+    DistilBERT       XGBoost        RAG Pipeline
+
+  Intent Model     SLA Prediction    ChromaDB
+
+                                         |
+                                         v
+
+                                 Knowledge Base
+
+                                         |
+                                         v
+
+                                  Gemini LLM
+
+                                         |
+                                         v
+
+                            Grounded Recommendation
+
+
+## Frontend Technology
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Docker containerized deployment
+- REST API integration
+## User Workflow
+
+1. User submits a support ticket.
+2. Frontend sends the request to `/analyze-ticket`.
+3. FastAPI orchestrates all AI components.
+4. DistilBERT predicts ticket intent.
+5. XGBoost estimates SLA breach probability.
+6. ChromaDB retrieves relevant knowledge base documents.
+7. Gemini generates grounded support recommendations.
+8. Frontend displays predictions, recommendations, and retrieved sources.
+
+
+
+## Docker Deployment
+
+SupportOps AI is fully containerized using Docker and Docker Compose to provide a reproducible development and deployment environment.
+
+The application is composed of two containerized services:
+
+## Backend Container
+
+The backend container runs the FastAPI AI service and provides:
+
+- REST API endpoints for ticket analysis
+- DistilBERT-based intent classification inference
+- XGBoost-based SLA breach risk prediction
+- ChromaDB vector retrieval pipeline
+- Gemini-powered grounded recommendation generation
+- Health monitoring endpoints
+
+
+## Frontend Container
+
+The frontend container provides the user-facing dashboard built with:
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+
+Responsibilities include:
+
+- Customer ticket submission
+- Calling backend REST APIs
+- Displaying intent predictions
+- Visualizing SLA risk scores
+- Presenting AI-generated recommendations
+- Showing retrieved knowledge sources
+
+
+## Application Screenshots
+
+### Ticket Analysis Dashboard
+
+The dashboard allows users to submit customer tickets and view:
+
+- Intent classification
+- SLA breach risk prediction
+- AI-generated support recommendations
+- Retrieved knowledge sources
+
+
+![SupportOps Dashboard](docs/screenshots/dashboard.png)
+
+
+### AI Recommendation and RAG Retrieval
+
+The system retrieves relevant support documents from ChromaDB and generates grounded recommendations using Gemini.
+
+
+![RAG Recommendation](docs/screenshots/rag-recommendation.png)
+
+
+### Backend API Documentation
+
+FastAPI provides interactive Swagger documentation for testing endpoints.
+
+
+![Swagger API](docs/screenshots/swagger-api-docs.png)
+
+
+### Health Monitoring
+
+The backend exposes health checks for service readiness.
+
+
+![Health Check](docs/screenshots/api-health-check.png)
+
+### FastAPI Root Endpoint
+
+The backend service exposes a health-ready API running through FastAPI.
+
+![FastAPI Root Endpoint](docs/screenshots/fastapi-root-endpoint.png)
+
+## API Quick Reference
+
+| Endpoint | Description |
+|---|---|
+| GET /health | Service readiness check |
+| POST /predict-intent | Intent classification |
+| POST /predict-sla-risk | SLA risk prediction |
+| POST /rag | Grounded recommendation generation |
+| POST /analyze-ticket | Complete ticket analysis workflow |
+
+
+## Running Locally
+
+Prerequisites:
+
+- Git
+- Docker Desktop
+- Docker Compose
+
+
+### Clone Repository
+
+```bash
+git clone <repository-url>
+cd supportops-ai
+Start Application
+
+Build and start all services:
+docker compose up --build
+
+---
+
+# 4. Add service URLs
+
+After docker compose command add:
+
+```markdown
+The application will be available at:
+
+### Frontend Dashboard
+http://localhost:3000
+
+### Backend API
+http://localhost:8001
+
+#Application
+
+## Future Improvements
+
+Potential improvements include:
+
+- Deploying the application to Azure Kubernetes Service (AKS)
+- Adding authentication and role-based access control
+- Implementing real-time ticket streaming
+- Adding model monitoring with MLflow
+- Integrating enterprise ticketing systems
+- Expanding multilingual support
