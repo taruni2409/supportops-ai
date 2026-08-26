@@ -574,13 +574,18 @@ After docker compose command add:
 ```markdown
 The application will be available at:
 
-### Frontend Dashboard
+Frontend Dashboard
+
 http://localhost:3000
 
-### Backend API
+Backend API
+
 http://localhost:8001
 
-#Application
+Swagger Documentation
+
+http://localhost:8001/docs
+
 
 ## Future Improvements
 

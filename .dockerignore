@@ -6,6 +6,8 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+**/__pycache__/
+*.pyc
 
 # Local Python environments
 .venv/
@@ -36,3 +38,7 @@ frontend/
 ml/artifacts/distilbert_5epoch_checkpoints/
 ml/artifacts/distilbert_checkpoints/
 ml/artifacts/banking77_tfidf_logreg.joblib
+
+# Training checkpoints not required for inference
+ml/artifacts/distilbert_5epoch_checkpoints/
+ml/artifacts/distilbert_checkpoints/

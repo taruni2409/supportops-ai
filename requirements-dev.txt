@@ -1,0 +1,7 @@
+pytest
+httpx
+jupyter
+pandas
+matplotlib
+shap
+scikit-learn
