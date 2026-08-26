@@ -111,7 +111,7 @@ export default function Home() {
     setResult(null);
 
     const response = await fetch(
-      `${API_BASE_URL}/analyze-ticket`,
+      "/api/analyze-ticket",
       {
         method: "POST",
 
