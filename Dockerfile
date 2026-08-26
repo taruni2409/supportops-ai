@@ -25,5 +25,4 @@ EXPOSE 8001
 
 # Important for our PyTorch + XGBoost runtime
 ENV OMP_NUM_THREADS=1
-
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
