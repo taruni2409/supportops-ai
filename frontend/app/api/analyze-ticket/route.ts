@@ -351,7 +351,7 @@ Rules:
           ticket_priority ||
           "Unknown",
 
-        resolution:
+        answer:
           analysis.recommended_resolution ||
           "Further investigation is required.",
 
