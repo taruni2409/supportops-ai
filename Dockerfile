@@ -1,5 +1,7 @@
 FROM python:3.11-slim
 
+FROM python:3.11-slim
+
 WORKDIR /app
 
 # Required system packages
@@ -20,9 +22,10 @@ COPY ml ./ml
 COPY rag ./rag
 COPY knowledge_base ./knowledge_base
 
-# The API runs on port 8001
-EXPOSE 8001
+# FastAPI listens on port 8000 inside the container
+EXPOSE 8000
 
-# Important for our PyTorch + XGBoost runtime
+# Keep PyTorch + XGBoost CPU runtime stable
 ENV OMP_NUM_THREADS=1
+
 CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

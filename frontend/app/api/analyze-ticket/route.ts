@@ -15,7 +15,7 @@ async function loadKnowledgeBase() {
     file.endsWith(".md")
   );
 
-  const documents = await Promise.all(
+  return Promise.all(
     markdownFiles.map(async (file) => {
       const filePath = path.join(
         knowledgeBasePath,
@@ -33,8 +33,105 @@ async function loadKnowledgeBase() {
       };
     })
   );
+}
 
-  return documents;
+async function analyzeWithVercelFallback(body: any) {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error(
+      "GEMINI_API_KEY is not configured."
+    );
+  }
+
+  const knowledgeBase =
+    await loadKnowledgeBase();
+
+  const knowledgeContext =
+    knowledgeBase
+      .map(
+        (document) => `
+SOURCE: ${document.source}
+
+${document.text}
+`
+      )
+      .join("\n\n");
+
+  const genAI =
+    new GoogleGenerativeAI(
+      process.env.GEMINI_API_KEY
+    );
+
+  const model =
+    genAI.getGenerativeModel({
+      model: "gemini-3.5-flash-lite",
+    });
+
+  const prompt = `
+You are the SupportOps AI assistant for NovaBank.
+
+Analyze the customer support ticket using ONLY
+the NovaBank knowledge base provided below for
+the support recommendation.
+
+Do not invent company policies.
+
+Customer Ticket:
+${body.ticket_text.trim()}
+
+Operational Context:
+Priority: ${body.ticket_priority}
+Channel: ${body.ticket_channel}
+Customer Tier: ${body.customer_tier}
+Queue Load: ${body.queue_load}%
+Agent Utilization: ${body.agent_utilization}
+
+NovaBank Knowledge Base:
+${knowledgeContext}
+
+Return ONLY valid JSON.
+
+Use exactly this structure:
+
+{
+  "intent": "short intent name",
+  "confidence_percentage": number,
+  "sla_category": "short SLA category",
+  "sla_breach_percentage": number,
+  "sla_risk": "Low | Medium | High",
+  "recommended_resolution": "support recommendation based on the knowledge base",
+  "sources": [
+    {
+      "source": "filename",
+      "text": "relevant excerpt from the knowledge base"
+    }
+  ]
+}
+
+Rules:
+
+1. confidence_percentage must be between 0 and 100.
+2. sla_breach_percentage must be between 0 and 100.
+3. Only use information supported by the knowledge base.
+4. If the knowledge base does not contain enough information,
+   say that further investigation is required.
+5. Include only the most relevant knowledge-base sources.
+6. Do not create fake source filenames.
+`;
+
+  const result =
+    await model.generateContent(prompt);
+
+  const rawResponse =
+    result.response.text();
+
+  const cleanedResponse =
+    rawResponse
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
+
+  return JSON.parse(cleanedResponse);
 }
 
 export async function POST(req: Request) {
@@ -62,283 +159,125 @@ export async function POST(req: Request) {
     }
 
     // ---------------------------------------------------------
-    // STEP 1: Load NovaBank knowledge base
+    // MODE 1: Full local Docker deployment
+    //
+    // If RAG_API_URL exists, use the FastAPI backend.
+    // FastAPI performs:
+    // - Intent classification
+    // - SLA prediction
+    // - RAG retrieval
+    // - Gemini recommendation
     // ---------------------------------------------------------
 
-    const knowledgeBase =
-      await loadKnowledgeBase();
-
-    const knowledgeContext =
-      knowledgeBase
-        .map(
-          (document) => `
-SOURCE: ${document.source}
-
-${document.text}
-`
-        )
-        .join("\n\n");
-
-    // ---------------------------------------------------------
-    // STEP 2: Gemini
-    // ---------------------------------------------------------
-
-    if (!process.env.GEMINI_API_KEY) {
-      return Response.json(
+    if (process.env.RAG_API_URL) {
+      const response = await fetch(
+        process.env.RAG_API_URL,
         {
-          error:
-            "GEMINI_API_KEY is not configured.",
-        },
-        {
-          status: 500,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ticket_text: ticket_text.trim(),
+
+            ticket_priority,
+            ticket_channel,
+            customer_tier,
+
+            queue_load:
+              typeof queue_load === "number"
+                ? queue_load
+                : 0,
+
+            agent_utilization:
+              typeof agent_utilization === "number"
+                ? agent_utilization
+                : 0,
+
+            created_hour:
+              new Date().getHours(),
+
+            created_day:
+              (new Date().getDay() + 6) % 7,
+
+            previous_contacts: 0,
+            recent_tickets_30d: 0,
+            sentiment_score: 0,
+            account_age_days: 730,
+          }),
         }
       );
-    }
 
-    const genAI =
-      new GoogleGenerativeAI(
-        process.env.GEMINI_API_KEY
-      );
+      const data =
+        await response.json();
 
-    const model =
-      genAI.getGenerativeModel({
-        model: "gemini-3.5-flash-lite",
-      });
+      if (!response.ok) {
+        console.error(
+          "FastAPI analyze-ticket error:",
+          data
+        );
 
-    // ---------------------------------------------------------
-    // STEP 3: Analyze ticket
-    // ---------------------------------------------------------
-
-    const prompt = `
-You are the SupportOps AI assistant for NovaBank.
-
-Analyze the customer support ticket using ONLY
-the NovaBank knowledge base provided below for
-the support recommendation.
-
-Do not invent company policies.
-
-Customer Ticket:
-${ticket_text.trim()}
-
-Operational Context:
-Priority: ${ticket_priority}
-Channel: ${ticket_channel}
-Customer Tier: ${customer_tier}
-Queue Load: ${queue_load}%
-Agent Utilization: ${agent_utilization}
-
-NovaBank Knowledge Base:
-${knowledgeContext}
-
-Return ONLY valid JSON.
-
-Use exactly this structure:
-
-{
-  "intent": "short intent name",
-  "confidence_percentage": number,
-  "sla_category": "short SLA category",
-  "recommended_resolution": "support recommendation based on the knowledge base",
-  "sources": [
-    {
-      "source": "filename",
-      "text": "relevant excerpt from the knowledge base"
-    }
-  ]
-}
-
-Rules:
-
-1. confidence_percentage must be between 0 and 100.
-2. sla_category should describe the operational category.
-3. Only use information supported by the knowledge base.
-4. If the knowledge base does not contain enough information,
-   say that further investigation is required.
-5. Include only the most relevant knowledge-base sources.
-6. Do not create fake source filenames.
-`;
-
-    let result;
-
-    try {
-      result =
-        await model.generateContent(prompt);
-    } catch (error: any) {
-      console.error(
-        "Gemini error:",
-        error
-      );
-
-      if (error?.status === 429) {
         return Response.json(
           {
             error:
-              "Gemini quota exceeded. Please try again later.",
+              data?.detail ||
+              data?.error ||
+              "AI analysis failed",
           },
           {
-            status: 429,
+            status: response.status,
           }
         );
       }
 
-      throw error;
-    }
-
-    const rawResponse =
-      result.response.text();
-
-    // ---------------------------------------------------------
-    // STEP 4: Parse Gemini response
-    // ---------------------------------------------------------
-
-    let analysis;
-
-    try {
-      const cleanedResponse =
-        rawResponse
-          .replace(/^```json\s*/i, "")
-          .replace(/^```\s*/i, "")
-          .replace(/\s*```$/i, "")
-          .trim();
-
-      analysis =
-        JSON.parse(cleanedResponse);
-
-    } catch (error) {
-      console.error(
-        "Gemini returned invalid JSON:",
-        rawResponse
-      );
-
-      return Response.json(
-        {
-          error:
-            "AI returned an invalid response.",
-        },
-        {
-          status: 500,
-        }
-      );
+      return Response.json(data);
     }
 
     // ---------------------------------------------------------
-    // STEP 5: Calculate lightweight SLA risk
+    // MODE 2: Free Vercel deployment
     //
-    // This replaces the local XGBoost dependency for the
-    // Vercel-only demo deployment.
+    // No backend is required.
+    // Gemini + bundled knowledge base are used.
     // ---------------------------------------------------------
 
-    const priorityScore =
-      ticket_priority === "Critical"
-        ? 30
-        : ticket_priority === "High"
-          ? 20
-          : ticket_priority === "Medium"
-            ? 10
-            : 0;
-
-    const queueScore =
-      Math.min(
-        Number(queue_load) || 0,
-        100
-      ) * 0.25;
-
-    const utilizationScore =
-      Math.min(
-        Number(agent_utilization) || 0,
-        1
-      ) * 25;
-
-    const slaBreachPercentage =
-      Math.min(
-        95,
-        Math.max(
-          5,
-          priorityScore +
-            queueScore +
-            utilizationScore
-        )
-      );
-
-    const slaRisk =
-      slaBreachPercentage >= 60
-        ? "High"
-        : slaBreachPercentage >= 30
-          ? "Medium"
-          : "Low";
-
-    const decisionThreshold = 0.25;
-
-    const breachAlert =
-      slaBreachPercentage / 100 >=
-      decisionThreshold;
-
-    // ---------------------------------------------------------
-    // STEP 6: Build response expected by the existing UI
-    // ---------------------------------------------------------
-
-    const sources = Array.isArray(
-      analysis.sources
-    )
-      ? analysis.sources.map(
-          (source: any, index: number) => ({
-            rank: index + 1,
-            source:
-              source.source ||
-              "Knowledge Base",
-            chunk_id: String(index),
-            text:
-              source.text ||
-              "",
-            distance: null,
-            similarity: null,
-          })
-        )
-      : [];
+    const analysis =
+      await analyzeWithVercelFallback(body);
 
     return Response.json({
       ticket_text,
+
+      answer:
+        analysis.recommended_resolution ||
+        "Further investigation is required.",
 
       intent_analysis: {
         intent:
           analysis.intent ||
           "Unknown",
 
-        confidence:
-          Number(
-            analysis.confidence_percentage
-          ) / 100,
-
         confidence_percentage:
-          Number(
-            analysis.confidence_percentage
-          ),
+          typeof analysis.confidence_percentage ===
+          "number"
+            ? analysis.confidence_percentage
+            : 0,
 
         sla_category:
           analysis.sla_category ||
-          "General Support",
+          "Unknown",
       },
 
       sla_analysis: {
-        sla_breach_probability:
-          Number(
-            slaBreachPercentage
-          ) / 100,
-
         sla_breach_percentage:
-          Number(
-            slaBreachPercentage.toFixed(2)
-          ),
-
-        breach_alert:
-          breachAlert,
+          typeof analysis.sla_breach_percentage ===
+          "number"
+            ? analysis.sla_breach_percentage
+            : 0,
 
         risk:
-          slaRisk,
+          analysis.sla_risk ||
+          "Unknown",
 
-        decision_threshold:
-          decisionThreshold,
+        decision_threshold: 0.25,
       },
 
       support_recommendation: {
@@ -355,10 +294,28 @@ Rules:
           analysis.recommended_resolution ||
           "Further investigation is required.",
 
-        sources,
+        sources:
+          Array.isArray(analysis.sources)
+            ? analysis.sources.map(
+                (
+                  source: any,
+                  index: number
+                ) => ({
+                  rank: index + 1,
+                  source:
+                    source.source ||
+                    "Unknown",
+                  chunk_id:
+                    String(index),
+                  text:
+                    source.text || "",
+                  distance: null,
+                  similarity: null,
+                })
+              )
+            : [],
 
-        top_similarity:
-          null,
+        top_similarity: null,
       },
     });
 
@@ -371,11 +328,9 @@ Rules:
     return Response.json(
       {
         error:
-          "AI processing failed.",
-        details:
           error instanceof Error
             ? error.message
-            : "Unknown error",
+            : "AI processing failed",
       },
       {
         status: 500,

@@ -7,7 +7,7 @@ services:
     container_name: supportops-ai-backend
 
     ports:
-      - "8001:8001"
+      - "8001:8000"
 
     env_file:
       - .env
@@ -21,27 +21,25 @@ services:
           "CMD",
           "python",
           "-c",
-          "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
         ]
       interval: 15s
       timeout: 5s
       retries: 5
       start_period: 30s
 
-
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
 
-      args:
-        environment:
-        - NODE_ENV=production
-
     container_name: supportops-ai-frontend
 
     ports:
       - "3000:3000"
+
+    environment:
+      RAG_API_URL: "http://backend:8000/analyze-ticket"
 
     depends_on:
       backend:
