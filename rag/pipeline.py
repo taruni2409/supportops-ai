@@ -142,9 +142,11 @@ def retrieve_context(
                 ],
 
             "chunk_id":
-                results["metadatas"][0][i][
-                    "chunk_id"
-                ],
+                str(
+                    results["metadatas"][0][i][
+                        "chunk"
+                    ]
+                ),
 
             "text":
                 results["documents"][0][i],

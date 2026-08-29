@@ -10,9 +10,8 @@ type TicketForm = {
   queue_load: number;
   agent_utilization: number;
 };
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ??
-  "http://127.0.0.1:8001";
+
+const API_BASE_URL = "";
 export default function Home() {
   const [form, setForm] = useState<TicketForm>({
     ticket_text: "",
@@ -23,6 +22,9 @@ export default function Home() {
     agent_utilization: 0.84,
   });
 
+
+
+  const [lastRequestTime, setLastRequestTime] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] =
@@ -31,25 +33,25 @@ export default function Home() {
   "checking" | "online" | "offline"
   >("checking");
 
-  useEffect(() => {
+useEffect(() => {
   const checkApiHealth = async () => {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/health`
+        "/api/health",
+        {
+          method: "GET",
+          cache: "no-store",
+        }
       );
 
-      if (!response.ok) {
-        throw new Error("Health check failed");
-      }
-
-      const data = await response.json();
-
-      if (data.status === "healthy") {
+      if (response.ok) {
         setApiStatus("online");
       } else {
         setApiStatus("offline");
       }
-    } catch {
+
+    } catch (error) {
+      console.log("Health check failed:", error);
       setApiStatus("offline");
     }
   };
@@ -66,6 +68,16 @@ export default function Home() {
 
 
   const handleAnalyze = async () => {
+  const requestTimestamp = Date.now();
+
+  if (requestTimestamp - lastRequestTime < 10000) {
+    setError("Please wait a few seconds before trying again.");
+    return;
+  }
+
+  setLastRequestTime(requestTimestamp);
+
+
   if (!form.ticket_text.trim()) {
     return;
   }
@@ -517,12 +529,16 @@ export default function Home() {
                 {result && (
                   <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
                     <span className="text-xs text-slate-400">SLA Category</span>
-                    
+
                     <span className="text-xs font-medium capitalize text-slate-600">
-                      {result.intent_analysis.sla_category?.replaceAll("_", " ") ?? "—"}
-                      </span>
-                      </div>
-                    )}
+                      {result.intent_analysis?.sla_category
+                        ? result.intent_analysis.sla_category
+                            .replaceAll("_", " ")
+                            .replace(/\b\w/g, (c) => c.toUpperCase())
+                        : "—"}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* SLA */}
@@ -583,7 +599,9 @@ export default function Home() {
                     <span className="text-xs text-slate-400">Alert threshold</span>
 
                     <span className="text-xs font-medium text-slate-600">
-                      {(result.sla_analysis.decision_threshold * 100).toFixed(0)}%
+                      {typeof result.sla_analysis?.decision_threshold === "number"
+                      ? `${(result.sla_analysis.decision_threshold * 100).toFixed(0)}%`
+                      : "N/A"}
                     </span>
                   </div>
                 )}
@@ -634,7 +652,9 @@ export default function Home() {
 
                       <span className="text-xs text-slate-400">
                         Top retrieval similarity:{" "}
-                        {(result.support_recommendation.top_similarity * 100).toFixed(2)}%
+                        {result?.support_recommendation?.top_similarity
+                        ? `${result.support_recommendation.top_similarity.toFixed(2)}%`
+                        : "N/A"}
                       </span>
                     </div>
 
