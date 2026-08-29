@@ -276,6 +276,12 @@ export async function POST(req: Request) {
         risk:
           analysis.sla_risk ||
           "Unknown",
+          
+        breach_alert:
+            typeof analysis.sla_breach_percentage === "number"
+            ? analysis.sla_breach_percentage / 100 >= 0.25
+            : false,  
+
 
         decision_threshold: 0.25,
       },
